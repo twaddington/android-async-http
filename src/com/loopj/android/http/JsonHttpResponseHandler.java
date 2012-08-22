@@ -37,7 +37,7 @@ import android.os.Message;
  * Additionally, you can override the other event methods from the
  * parent class.
  */
-public class JsonHttpResponseHandler extends AsyncHttpResponseHandler {
+public abstract class JsonHttpResponseHandler extends AsyncHttpResponseHandler {
     protected static final int SUCCESS_JSON_MESSAGE = 100;
 
     //
@@ -45,25 +45,38 @@ public class JsonHttpResponseHandler extends AsyncHttpResponseHandler {
     //
 
     /**
-     * Fired when a request returns successfully and contains a json object
-     * at the base of the response string. Override to handle in your
-     * own code.
+     * Fired when a request returns successfully and contains a JSONObject
+     * at the base of the response string.
+     * 
      * @param response the parsed json object found in the server response (if any)
      */
-    public void onSuccess(JSONObject response) {}
-
+    public abstract void onSuccess(JSONObject response);
 
     /**
-     * Fired when a request returns successfully and contains a json array
-     * at the base of the response string. Override to handle in your
-     * own code.
+     * Fired when a request returns successfully and contains a JSONArray
+     * at the base of the response string.
+     * 
      * @param response the parsed json array found in the server response (if any)
      */
-    public void onSuccess(JSONArray response) {}
+    public abstract void onSuccess(JSONArray response);
 
-    public void onFailure(Throwable e, JSONObject errorResponse) {}
-    public void onFailure(Throwable e, JSONArray errorResponse) {}
-
+    /**
+     * Fired when a request fails and contains a JSONObject
+     * at the base of the response string.
+     * 
+     * @param e
+     * @param errorResponse
+     */
+    public abstract void onFailure(Throwable e, JSONObject errorResponse);
+    
+    /**
+     * Fired when a request fails and contains a JSONArray
+     * at the base of the response string.
+     * 
+     * @param e
+     * @param errorResponse
+     */
+    public abstract void onFailure(Throwable e, JSONArray errorResponse);
 
     //
     // Pre-processing of messages (executes in background threadpool thread)
@@ -78,7 +91,6 @@ public class JsonHttpResponseHandler extends AsyncHttpResponseHandler {
             sendFailureMessage(e, responseBody);
         }
     }
-
 
     //
     // Pre-processing of messages (in original calling thread, typically the UI thread)
@@ -105,16 +117,24 @@ public class JsonHttpResponseHandler extends AsyncHttpResponseHandler {
         }
     }
 
+    /**
+     * Determine if the response body starts with a serialized
+     * <code>JSONObject</code> or <code>JSONArray</code>.
+     * 
+     * @param responseBody
+     * @return a <code>JSONObject</code> or <code>JSONArray</code>; null if the
+     * response cannot be parsed as valid JSON.
+     * @throws JSONException
+     */
     protected Object parseResponse(String responseBody) throws JSONException {
-        Object result = null;
         // trim the string to prevent start with blank, and test if the string
         // is valid JSON, because the parser don't do this :(. If Json is not
         // valid this will return null
         responseBody = responseBody.trim();
         if (responseBody.startsWith("{") || responseBody.startsWith("[")) {
-            result = new JSONTokener(responseBody).nextValue();
+            return new JSONTokener(responseBody).nextValue();
         }
-        return result;
+        return null;
     }
 
     @Override

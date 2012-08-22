@@ -66,7 +66,7 @@ import android.os.Looper;
  * });
  * </pre>
  */
-public class AsyncHttpResponseHandler {
+public abstract class AsyncHttpResponseHandler {
     protected static final int SUCCESS_MESSAGE = 0;
     protected static final int FAILURE_MESSAGE = 1;
     protected static final int START_MESSAGE = 2;
@@ -96,25 +96,33 @@ public class AsyncHttpResponseHandler {
     /**
      * Fired when the request is started, override to handle in your own code
      */
-    public void onStart() {}
+    public void onStart() {
+        // Pass
+    }
 
     /**
      * Fired in all cases when the request is finished, after both success and failure, override to handle in your own code
      */
-    public void onFinish() {}
+    public void onFinish() {
+        // Pass
+    }
 
     /**
      * Fired when a request returns successfully, override to handle in your own code
      * @param content the body of the HTTP response from the server
      */
-    public void onSuccess(String content) {}
+    public void onSuccess(String content) {
+        // Pass
+    }
 
     /**
      * Fired when a request fails to complete, override to handle in your own code
      * @param error the underlying cause of the failure
      * @deprecated use {@link #onFailure(Throwable, String)}
      */
-    public void onFailure(Throwable error) {}
+    public void onFailure(Throwable error) {
+        // Pass
+    }
 
     /**
      * Fired when a request fails to complete, override to handle in your own code
@@ -125,7 +133,6 @@ public class AsyncHttpResponseHandler {
         // By default, call the deprecated onFailure(Throwable) for compatibility
         onFailure(error);
     }
-
 
     //
     // Pre-processing of messages (executes in background threadpool thread)
@@ -151,7 +158,6 @@ public class AsyncHttpResponseHandler {
         sendMessage(obtainMessage(FINISH_MESSAGE, null));
     }
 
-
     //
     // Pre-processing of messages (in original calling thread, typically the UI thread)
     //
@@ -163,8 +169,6 @@ public class AsyncHttpResponseHandler {
     protected void handleFailureMessage(Throwable e, String responseBody) {
         onFailure(e, responseBody);
     }
-
-
 
     // Methods which emulate android's Handler and Message methods
     protected void handleMessage(Message msg) {
@@ -205,7 +209,6 @@ public class AsyncHttpResponseHandler {
         return msg;
     }
 
-
     // Interface to AsyncHttpRequest
     protected void sendResponseMessage(HttpResponse response) {
         StatusLine status = response.getStatusLine();
@@ -220,7 +223,7 @@ public class AsyncHttpResponseHandler {
         } catch(IOException e) {
             sendFailureMessage(e, (String) null);
         }
-
+        
         if(status.getStatusCode() >= 300) {
             sendFailureMessage(new HttpResponseException(status.getStatusCode(), status.getReasonPhrase()), responseBody);
         } else {
