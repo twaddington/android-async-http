@@ -46,6 +46,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -546,6 +547,36 @@ public class AsyncHttpClient {
         sendRequest(httpClient, httpContext, delete, null, responseHandler, context);
     }
 
+    /**
+     * Perform an HTTP HEAD request.
+     * 
+     * @param context
+     * @param url
+     * @param responseHandler
+     */
+    public void head(Context context, String url,
+            AsyncHttpResponseHandler responseHandler) {
+        head(context, url, null, responseHandler);
+    }
+
+    /**
+     * Perform an HTTP HEAD request.
+     * 
+     * @param context
+     * @param url
+     * @param headers
+     * @param responseHandler
+     */
+    public void head(Context context, String url, Header[] headers,
+            AsyncHttpResponseHandler responseHandler) {
+        HttpHead request = new HttpHead(url);
+        
+        if (headers != null) {
+            request.setHeaders(headers);
+        }
+        
+        sendRequest(httpClient, httpContext, request, null, responseHandler, context);
+    }
 
     // Private stuff
     private void sendRequest(DefaultHttpClient client, HttpContext httpContext, HttpUriRequest uriRequest, String contentType, AsyncHttpResponseHandler responseHandler, Context context) {
